@@ -2,12 +2,14 @@
 
 std::vector<std::unique_ptr<BaseModel>> ObjectVector; // the vector for all Models
 
+const int TILE_GRASS = 1;
 
 const int MAP_IDX = 1;
 const int PLAYER_SPRITE = 2;
 bool ShouldAddPlayerSprite = false;
 bool ShouldUpdatePlayerSprite = false;
 bool ShouldAddTileMap = false;
+bool ShouldUpdateTile = false;
 bool ShouldUpdateTileMap = false;
 
 int SetMapBaseHeight = 100;  // this is the height from the bottom of the window 
@@ -19,6 +21,8 @@ int MapIdx = 0;
 
 // #### Map Editor ######
 bool showGrid = false;
+bool ShowTileEditor = false;
+unsigned int creatTileTex = 0;
 
 int objectUpdateIndex = 0; 
 

@@ -23,27 +23,11 @@ public:
     glm::mat4 GetViewMatrix() const {
         return glm::translate(glm::mat4(1.0f), glm::vec3(-Position, 0.0f));
     }
-    /*glm::mat4 GetProjectionMatrix() const {
-        return glm::ortho(
-            0.0f,
-            ViewWidth / Zoom,
-            ViewHeight / Zoom,
-            0.0f,
-            -1.0f,
-            1.0f
-        );
-    }*/
+    
     glm::mat4 GetProjectionMatrix() const {
         return glm::ortho(0.0f, ViewWidth / Zoom, ViewHeight / Zoom, 0.0f, -1.0f, 1.0f);
     }
     
-
-    /*glm::mat4 GetProjectionMatrix() const {
-        float halfW = ViewWidth * 0.5f / Zoom;
-        float halfH = ViewHeight * 0.5f / Zoom;
-        return glm::ortho(-halfW, halfW, -halfH, halfH, -1.0f, 1.0f);
-    }*/
-
     void Move(const glm::vec2& delta) {
         Position += delta;
     }

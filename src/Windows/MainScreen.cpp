@@ -236,6 +236,10 @@ void MainScreen::MainWindowMenu(GLFWwindow* window)
     }
     if (ImGui::BeginMenu("Edit"))
     {
+        if (ImGui::MenuItem("Open Editor"))
+        {
+            ShowTileEditor = true;
+        }
         if (ImGui::MenuItem("Cut"))
         {
 

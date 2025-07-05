@@ -170,185 +170,185 @@ std::vector<std::unique_ptr<BaseModel>>& EntityNodes::GetModels()
     return ObjectVector;
 }
 
-void EntityNodes::EntityManagmentSystem(std::vector<std::unique_ptr<BaseModel>>& ObjectVector,
-    int& currentIndex, int& index, int& objectIndex, int& indexTypeID) {
-    ImGui::Begin("Entity Management System"); // start of the window
-
-    
-    ImGui::SeparatorText("Scene Collection");
-
-    if (ImGui::BeginTabBar("##Main", ImGuiTabBarFlags_None))
-    {
-        if (ImGui::BeginTabItem("Scene Tree"))
-        {
-           
-            auto flags = ImGuiTreeNodeFlags_DefaultOpen;
-            if (ImGui::TreeNodeEx("Editor Scene", flags)) {
-
-                for (const auto& data : ObjectVector) {
-                    
-                    ImGuiTreeNodeFlags nodeFlags = flags | (SelectedDataManager::Instance().GetSelectedData() == data.get() ? ImGuiTreeNodeFlags_Selected : 0);
-
-                    bool nodeOpen = ImGui::TreeNodeEx((void*)(intptr_t)data->objectIndex, nodeFlags,
-                        "  %s : %d : Type ID : %d",
-                       // %d : %s : %d : Type ID : %d",
-                        //"Object: %d : %s : %d : Type ID : %d",
-                        data->objectName.c_str(), data->objectIndex, data->objectTypeID);
-                       // data->index, data->objectName.c_str(), data->objectIndex, data->objectTypeID);
-                    // #####
-                   
-                    // #####
-                    if (ImGui::IsItemClicked()) {
-                        SelectedDataManager::Instance().SetSelectedData(data.get());
-                        data->isSelected = true;
-                        
-                        std::cout << "Data Selected was " << data->objectName.c_str() << " : " << data->objectIndex << std::endl;
-                    }
-
-                    if (ImGui::IsItemHovered()) {
-                        // Perform actions when the node is hovered
-                        ImGui::SetTooltip("Right click to Edit %s | %d", data->objectName.c_str(), data->objectIndex);
-                        
-                    }
-
-                    if (nodeOpen) {
-                        //this->onRightClick(data->objectIndex); // Pass a unique identifier
-                        this->onRightClick(data->index); // Pass a unique identifier
-
-                        if (ImGui::BeginPopup(("NodePopup" + std::to_string(data->index)).c_str())) {
-                            ImGui::TextColored(COLOR_LIGHTBLUE, ICON_FA_EDIT " ENTITY");
-                            ImGui::Separator(); // Draw a line
-                            if (ImGui::Selectable(ICON_FA_PEN_ALT " Edit")) {
-                                SelectedDataManager::Instance().SetSelectedData(data.get());
-
-                                // Copy the current name to the buffer
-                                 strncpy_s(nameBuffer, data->objectName.c_str(), sizeof(nameBuffer));
-                                 nameBuffer[sizeof(nameBuffer) - 1] = '\0';
-                                
-                               
-                                std::cout << "Object Selected To Edit " << data->objectName.c_str() << " : " << data->objectIndex << std::endl;
-                                
-                                switch (data.get()->objectTypeID) {
-                                case 0: // Grid
-                                    break;
-                                case 1: // cube
-                                    showObjectEditor = true;
-
-                                    std::cout << "Data Selected  is a Cube " << data->objectName.c_str() << " : " << data->objectIndex << std::endl;
-                                    LogInternals::Instance()->Debug("Data Selected  is a Cube");
-                                    break;
-                                case 2: // plane
-                                    showObjectEditor = true;
-                                    LogInternals::Instance()->Debug("Data Selected  is a plane");
-                                    break;
-                                case 3:
-                                    break;
-                                case 4: //
-                                   
-                                    break;
-                                case 5:
-                                    break;
-                                case 6:
-                                    break;
-                                case 7:
-                                    break;
-                                case 8:
-                                    showObjectEditor = true;
-                                    break;
-                                case 9:
-                                    showObjectEditor = true;
-                                    break;
-                                case 10:
-                                    showObjectEditor = true;
-                                    break;
-                                case 11: // pyramid
-                                    showObjectEditor = true;
-                                    LogInternals::Instance()->Debug("Data Selected  is a plane");
-                                    break;
-                                case 12: // 0bj file
-                                    showObjectEditor = true;
-                                    LogInternals::Instance()->Debug("Data Selected  is a obj file");
-                                    break;
-
-
-                                default:
-                                    std::cout << "Data Selected Something Else " << data->objectName.c_str() << " : " << data->objectIndex << std::endl;
-                                    break;
-
-                                }                                                                              
-                            
-                            
-                            }
-                            if (ImGui::Selectable(ICON_FA_PLUS " New")) {
-                                // open a window or popup to select the object
-                                std::cout << "Object To Add "  << std::endl;
-                            }
-                            if (ImGui::Selectable(ICON_FA_COPY " Clone")) {
-
-                                std::cout << "Data Selected To Clone " << data->objectName.c_str() << " : " << data->objectIndex << std::endl;
-                            }
-                            if (ImGui::Selectable(ICON_FA_TRASH_ALT " Delete")) {
-                                // open window to ask if your sure
-                                std::cout << "Data Selected To Delete " << data->objectName.c_str() << " : " << data->objectIndex << std::endl;
-                            }
-
-                            ImGui::EndPopup();
-                        }
-
-                        ImGui::TreePop();
-                                                
-                    }
-                    
-          
-                }
-                ImGui::TreePop();
-                                
-            }      
-
-            ImGui::EndTabItem();
-
-        }
-        // ###########################################  MAP EDITOR ##################################
-        if (ImGui::BeginTabItem("Map Editor"))
-        {
-            ImGui::SeparatorText("Scene Editor");
-            ImGui::Checkbox("Show Editor Grid", &showGrid); // show editor grid
-
-            
-            ImGui::Text("Spidex 2d Engine ", nullptr);
-
-            if (ImGui::CollapsingHeader(ICON_FA_VIDEO" Texture Settings", ImGuiTreeNodeFlags_DefaultOpen))
-            {
-                ImGui::BeginTable("Test Table", 1, ImGuiTableFlags_Reorderable | ImGuiTableFlags_NoSavedSettings | ImGuiTableFlags_Borders);
-
-                ImGui::TableNextColumn();
-
-                ImGui::Text("Tabel one");
-
-                ImGui::TableNextRow();
-                ImGui::TableNextColumn();
-
-                ImGui::Text("Tabel two");
-                
-
-                ImGui::EndTable();
-            }
-           
-            ImGui::SeparatorText("EDITOR");
-            if (ImGui::CollapsingHeader(ICON_FA_VIDEO" Player Settings", ImGuiTreeNodeFlags_DefaultOpen)) {
-
-            }
-           
-
-            ImGui::EndTabItem();
-
-        }
-
-        ImGui::EndTabItem();
-    }
-    
-    ImGui::End();
-}
+//void EntityNodes::EntityManagmentSystem(std::vector<std::unique_ptr<BaseModel>>& ObjectVector,
+//    int& currentIndex, int& index, int& objectIndex, int& indexTypeID) {
+//    ImGui::Begin("Entity Management System"); // start of the window
+//
+//    
+//    ImGui::SeparatorText("Scene Collection");
+//
+//    if (ImGui::BeginTabBar("##Main", ImGuiTabBarFlags_None))
+//    {
+//        if (ImGui::BeginTabItem("Scene Tree"))
+//        {
+//           
+//            auto flags = ImGuiTreeNodeFlags_DefaultOpen;
+//            if (ImGui::TreeNodeEx("Editor Scene", flags)) {
+//
+//                for (const auto& data : ObjectVector) {
+//                    
+//                    ImGuiTreeNodeFlags nodeFlags = flags | (SelectedDataManager::Instance().GetSelectedData() == data.get() ? ImGuiTreeNodeFlags_Selected : 0);
+//
+//                    bool nodeOpen = ImGui::TreeNodeEx((void*)(intptr_t)data->objectIndex, nodeFlags,
+//                        "  %s : %d : Type ID : %d",
+//                       // %d : %s : %d : Type ID : %d",
+//                        //"Object: %d : %s : %d : Type ID : %d",
+//                        data->objectName.c_str(), data->objectIndex, data->objectTypeID);
+//                       // data->index, data->objectName.c_str(), data->objectIndex, data->objectTypeID);
+//                    // #####
+//                   
+//                    // #####
+//                    if (ImGui::IsItemClicked()) {
+//                        SelectedDataManager::Instance().SetSelectedData(data.get());
+//                        data->isSelected = true;
+//                        
+//                        std::cout << "Data Selected was " << data->objectName.c_str() << " : " << data->objectIndex << std::endl;
+//                    }
+//
+//                    if (ImGui::IsItemHovered()) {
+//                        // Perform actions when the node is hovered
+//                        ImGui::SetTooltip("Right click to Edit %s | %d", data->objectName.c_str(), data->objectIndex);
+//                        
+//                    }
+//
+//                    if (nodeOpen) {
+//                        //this->onRightClick(data->objectIndex); // Pass a unique identifier
+//                        this->onRightClick(data->index); // Pass a unique identifier
+//
+//                        if (ImGui::BeginPopup(("NodePopup" + std::to_string(data->index)).c_str())) {
+//                            ImGui::TextColored(COLOR_LIGHTBLUE, ICON_FA_EDIT " ENTITY");
+//                            ImGui::Separator(); // Draw a line
+//                            if (ImGui::Selectable(ICON_FA_PEN_ALT " Edit")) {
+//                                SelectedDataManager::Instance().SetSelectedData(data.get());
+//
+//                                // Copy the current name to the buffer
+//                                 strncpy_s(nameBuffer, data->objectName.c_str(), sizeof(nameBuffer));
+//                                 nameBuffer[sizeof(nameBuffer) - 1] = '\0';
+//                                
+//                               
+//                                std::cout << "Object Selected To Edit " << data->objectName.c_str() << " : " << data->objectIndex << std::endl;
+//                                
+//                                switch (data.get()->objectTypeID) {
+//                                case 0: // Grid
+//                                    break;
+//                                case 1: // cube
+//                                    showObjectEditor = true;
+//
+//                                    std::cout << "Data Selected  is a Cube " << data->objectName.c_str() << " : " << data->objectIndex << std::endl;
+//                                    LogInternals::Instance()->Debug("Data Selected  is a Cube");
+//                                    break;
+//                                case 2: // plane
+//                                    showObjectEditor = true;
+//                                    LogInternals::Instance()->Debug("Data Selected  is a plane");
+//                                    break;
+//                                case 3:
+//                                    break;
+//                                case 4: //
+//                                   
+//                                    break;
+//                                case 5:
+//                                    break;
+//                                case 6:
+//                                    break;
+//                                case 7:
+//                                    break;
+//                                case 8:
+//                                    showObjectEditor = true;
+//                                    break;
+//                                case 9:
+//                                    showObjectEditor = true;
+//                                    break;
+//                                case 10:
+//                                    showObjectEditor = true;
+//                                    break;
+//                                case 11: // pyramid
+//                                    showObjectEditor = true;
+//                                    LogInternals::Instance()->Debug("Data Selected  is a plane");
+//                                    break;
+//                                case 12: // 0bj file
+//                                    showObjectEditor = true;
+//                                    LogInternals::Instance()->Debug("Data Selected  is a obj file");
+//                                    break;
+//
+//
+//                                default:
+//                                    std::cout << "Data Selected Something Else " << data->objectName.c_str() << " : " << data->objectIndex << std::endl;
+//                                    break;
+//
+//                                }                                                                              
+//                            
+//                            
+//                            }
+//                            if (ImGui::Selectable(ICON_FA_PLUS " New")) {
+//                                // open a window or popup to select the object
+//                                std::cout << "Object To Add "  << std::endl;
+//                            }
+//                            if (ImGui::Selectable(ICON_FA_COPY " Clone")) {
+//
+//                                std::cout << "Data Selected To Clone " << data->objectName.c_str() << " : " << data->objectIndex << std::endl;
+//                            }
+//                            if (ImGui::Selectable(ICON_FA_TRASH_ALT " Delete")) {
+//                                // open window to ask if your sure
+//                                std::cout << "Data Selected To Delete " << data->objectName.c_str() << " : " << data->objectIndex << std::endl;
+//                            }
+//
+//                            ImGui::EndPopup();
+//                        }
+//
+//                        ImGui::TreePop();
+//                                                
+//                    }
+//                    
+//          
+//                }
+//                ImGui::TreePop();
+//                                
+//            }      
+//
+//            ImGui::EndTabItem();
+//
+//        }
+//        // ###########################################  MAP EDITOR ##################################
+//        if (ImGui::BeginTabItem("Map Editor"))
+//        {
+//            ImGui::SeparatorText("Scene Editor");
+//            ImGui::Checkbox("Show Editor Grid", &showGrid); // show editor grid
+//
+//            
+//            ImGui::Text("Spidex 2d Engine ", nullptr);
+//
+//            if (ImGui::CollapsingHeader(ICON_FA_VIDEO" Texture Settings", ImGuiTreeNodeFlags_DefaultOpen))
+//            {
+//                ImGui::BeginTable("Test Table", 1, ImGuiTableFlags_Reorderable | ImGuiTableFlags_NoSavedSettings | ImGuiTableFlags_Borders);
+//
+//                ImGui::TableNextColumn();
+//
+//                ImGui::Text("Tabel one");
+//
+//                ImGui::TableNextRow();
+//                ImGui::TableNextColumn();
+//
+//                ImGui::Text("Tabel two");
+//                
+//
+//                ImGui::EndTable();
+//            }
+//           
+//            ImGui::SeparatorText("EDITOR");
+//            if (ImGui::CollapsingHeader(ICON_FA_VIDEO" Player Settings", ImGuiTreeNodeFlags_DefaultOpen)) {
+//
+//            }
+//           
+//
+//            ImGui::EndTabItem();
+//
+//        }
+//
+//        ImGui::EndTabItem();
+//    }
+//    
+//    ImGui::End();
+//}
 
 
        

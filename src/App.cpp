@@ -78,8 +78,8 @@ void App::RunApp()
 
 			settings.SettingsWindow(window);  // Initialize the Settings Window
 
-			EntityNodes::Instance()->EntityManagmentSystem(entityComponents.GetModels(), currentIndex,
-				index, objectIndex, indexTypeID); // Entity Management System Scene list
+			//EntityNodes::Instance()->EntityManagmentSystem(entityComponents.GetModels(), currentIndex,
+			//	index, objectIndex, indexTypeID); // Entity Management System Scene list
 
 			
 			
@@ -92,11 +92,13 @@ void App::RunApp()
 			MainScreen::Instance()->ClearScreen(); // glClear GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_DEPTH_TEST
 
 			// ############################################# Camera Object !!! ################################
-			App::MainCamera(); // ########## This is the main Camera ##########
-						
+			App::MainCamera(); // ########## This is the main Camera ##########		
 			
 			EntityNodes::Instance()->ObjectEditor(entityComponents.GetModels());
 
+			// Tile Editor Window
+			static TileEditor tileEditor;
+			tileEditor.Render(entityComponents.GetModels());
 						
 			// Darw all objects on screen
 			EntityNodes::Instance()->RenderScene(camera.GetViewMatrix(),

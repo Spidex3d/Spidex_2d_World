@@ -6,4 +6,7 @@ My aim is to creat a 2d Editor and game engine using Opengl, Glfw, C++.
 I have been working on a 3d Editor which is great fun and I will continue to work on this.
 
 ✨ week 1 Set up new project GLFW, OpenGL, ImGui
-![image_alt](https://github.com/Spidex3d/Spidex_Editor/blob/fba776e2aafa5edf5c0f0265e196321f564684df/Readme/Editor_01.jpg)
+![image_alt](https://github.com/Spidex3d/Spidex_2d_world/blob/6e669dd199ed56423bf617217bb406a7aef550de/Readme/Editor_01.jpg)
+
+
+

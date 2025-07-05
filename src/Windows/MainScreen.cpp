@@ -147,11 +147,13 @@ void MainScreen::MainSceneWindow(GLFWwindow* window) // this is the window that 
         //if (ImGui::BeginMenu("New Mesh", &ShouldAddCube)) { // as far as i can tell ShouldAddCube is not nedded
         if (ImGui::BeginMenu("Add a new Object")) {
             
+             if (ImGui::MenuItem("Tile Map")) {
+                 ShouldAddTileMap = true;
+             }
              if (ImGui::MenuItem("Sprite")) {
-                 // set ShouldAddPlane to true then add plane to the tree
+                 // set ShouldAddPlayerSprite to true then add player to the tree
                  ShouldAddPlayerSprite = true;
              }
-             if (ImGui::MenuItem("Circle")) {}
              if (ImGui::MenuItem("Sphere")) {}
              if (ImGui::MenuItem("Cylinder")) {}            
             

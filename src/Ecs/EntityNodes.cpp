@@ -174,12 +174,14 @@ void EntityNodes::EntityManagmentSystem(std::vector<std::unique_ptr<BaseModel>>&
     int& currentIndex, int& index, int& objectIndex, int& indexTypeID) {
     ImGui::Begin("Entity Management System"); // start of the window
 
+    
+    ImGui::SeparatorText("Scene Collection");
+
     if (ImGui::BeginTabBar("##Main", ImGuiTabBarFlags_None))
     {
-        if (ImGui::BeginTabItem("Scene Lab"))
+        if (ImGui::BeginTabItem("Scene Tree"))
         {
-            ImGui::SeparatorText("Scene Collection");
-
+           
             auto flags = ImGuiTreeNodeFlags_DefaultOpen;
             if (ImGui::TreeNodeEx("Editor Scene", flags)) {
 
@@ -306,98 +308,37 @@ void EntityNodes::EntityManagmentSystem(std::vector<std::unique_ptr<BaseModel>>&
             ImGui::EndTabItem();
 
         }
-
-        if (ImGui::BeginTabItem("Object Selector"))
+        // ###########################################  MAP EDITOR ##################################
+        if (ImGui::BeginTabItem("Map Editor"))
         {
-            ImGui::Text("ID: Camera Lab");
-            ImGui::Text("Spidex Engine Add New Object ", nullptr);
+            ImGui::SeparatorText("Scene Editor");
+            ImGui::Checkbox("Show Editor Grid", &showGrid); // show editor grid
 
-            if (ImGui::CollapsingHeader(ICON_FA_VIDEO" object Settings", ImGuiTreeNodeFlags_DefaultOpen))
+            
+            ImGui::Text("Spidex 2d Engine ", nullptr);
+
+            if (ImGui::CollapsingHeader(ICON_FA_VIDEO" Texture Settings", ImGuiTreeNodeFlags_DefaultOpen))
             {
                 ImGui::BeginTable("Test Table", 1, ImGuiTableFlags_Reorderable | ImGuiTableFlags_NoSavedSettings | ImGuiTableFlags_Borders);
 
                 ImGui::TableNextColumn();
 
-                ImGui::SameLine();
-                if (ImGui::Button("Reset")) {
-                    cam_pos_val[0] = 0.0f, cam_pos_val[1] = 0.0f, cam_pos_val[2] = 2.0f;
-                }
-                ImGui::SameLine();
-
-                ImGui::DragFloat3("Position", cam_pos_val, 1.0f, 1.0f, 2.0f);
-                ImGui::TableNextRow();
-                ImGui::TableNextColumn();
-
-                ImGui::SameLine();
-                if (ImGui::Button("Reset")) {
-                    cam_rot_val[0] = 0.0f, cam_rot_val[1] = 0.0f, cam_rot_val[2] = 0.0f;
-                }
-                ImGui::SameLine();
-                ImGui::DragFloat3("Rotation", cam_rot_val, 1.0f, 1.0f, 1.0f);
+                ImGui::Text("Tabel one");
 
                 ImGui::TableNextRow();
                 ImGui::TableNextColumn();
 
-                ImGui::SameLine();
-                if (ImGui::Button("Reset")) {
-                    cam_scale_val[0] = 1.0f, cam_scale_val[1] = 1.0f, cam_scale_val[2] = 1.0f;
-                }// 1,1,1
-                ImGui::SameLine();
-                ImGui::DragFloat3("Scale", cam_scale_val, 1.0f, 1.0f, 1.0f);
-
-                //ImGui::Selectable(label, &selected);
+                ImGui::Text("Tabel two");
+                
 
                 ImGui::EndTable();
             }
            
-            ImGui::SeparatorText("Scene Collection");
-            // Test canera list
+            ImGui::SeparatorText("EDITOR");
+            if (ImGui::CollapsingHeader(ICON_FA_VIDEO" Player Settings", ImGuiTreeNodeFlags_DefaultOpen)) {
 
-                auto flags = ImGuiTreeNodeFlags_DefaultOpen;
-                if (ImGui::TreeNodeEx("Cameras", flags)) {
-
-                   
-                    // Camera Main
-                    ImGuiTreeNodeFlags nodeFlagsMain = flags | ImGuiTreeNodeFlags_Leaf;
-                    ImGui::TreeNodeEx("Camera Main", nodeFlagsMain);
-                    if (ImGui::IsItemClicked()) {
-                        // Handle the selection of Camera Main
-                        std::cout << "Camera Main selected" << std::endl;
-                    }
-                    ImGui::TreePop();
-
-                    // Camera Top
-                    ImGuiTreeNodeFlags nodeFlagsTop = flags | ImGuiTreeNodeFlags_Leaf;
-                    ImGui::TreeNodeEx("Camera Top", nodeFlagsTop);
-                    if (ImGui::IsItemClicked()) {
-                        // Handle the selection of Top Left
-                        std::cout << "Camera Top selected" << std::endl;
-                    }
-                    ImGui::TreePop();
-
-                    // Camera Left
-                    ImGuiTreeNodeFlags nodeFlagsLeft = flags | ImGuiTreeNodeFlags_Leaf;
-                    ImGui::TreeNodeEx("Camera Left", nodeFlagsLeft);
-                    if (ImGui::IsItemClicked()) {
-                        // Handle the selection of Camera Left
-                        std::cout << "Camera Left selected" << std::endl;
-                    }
-                    ImGui::TreePop();
-
-                    // Camera Right
-                    ImGuiTreeNodeFlags nodeFlagsRight = flags | ImGuiTreeNodeFlags_Leaf;
-                    ImGui::TreeNodeEx("Camera Right", nodeFlagsRight);
-                    if (ImGui::IsItemClicked()) {
-                        // Handle the selection of Camera Right
-                        std::cout << "Camera Right selected" << std::endl;
-                    }
-                    ImGui::TreePop();
-
-                ImGui::TreePop();
-                   
-                }          
-
-            // End Test camera list
+            }
+           
 
             ImGui::EndTabItem();
 
@@ -418,6 +359,7 @@ void EntityNodes::RenderScene(const glm::mat4& view, const glm::mat4& projection
 {
    
     EntityNodes::RenderSprite(view, projection, ObjectVector, currentIndex, SpriteIdx);
+    EntityNodes::RenderTileMap(view, projection, ObjectVector, currentIndex, MapIdx);
     
    
 }
@@ -506,6 +448,53 @@ void EntityNodes::RenderSprite(const glm::mat4& view, const glm::mat4& projectio
             glBindTexture(GL_TEXTURE_2D, 0);
         }
     }
+}
+
+void EntityNodes::RenderTileMap(const glm::mat4& view, const glm::mat4& projection,
+    std::vector<std::unique_ptr<BaseModel>>& ObjectVector, int& currentIndex, int& MapIdx)
+{
+    if (TileMapNo < 1) { // if TileMapNo = 0 load a map
+        if (ShouldAddTileMap) {
+            std::unique_ptr<TileMap> newMap = std::make_unique<TileMap>(currentIndex, "Main Map", MapIdx);
+
+            // we will need to set the pos here I think
+            //newMap->position = glm::vec3(0.0f, -1.0f, 0.0f);
+            //newMap->scale = glm::vec3(100.0f, 100.0f, 1.0f);
+
+           /* newMap->modelMatrix = glm::mat4(1.0f);
+            newMap->modelMatrix = glm::translate(newMap->modelMatrix, newMap->position);
+            newMap->modelMatrix = glm::scale(newMap->modelMatrix, newMap->scale);*/
+
+            
+            newMap->LoadExampleMap();
+
+            newMap->tileTexture = loadTexture("Textures/Brick.jpg");
+
+            ObjectVector.push_back(std::move(newMap));
+            TileMapNo = 1; // only allow 1 map
+
+            ShouldAddTileMap = false;
+        }
+    }
+
+    if (ShouldUpdateTileMap) {
+        // use this to change maps
+    }
+
+    for (const auto& model : ObjectVector) {
+
+        if (auto* map = dynamic_cast<TileMap*>(model.get())) {
+           
+            ShaderManager::SpriteShader->Use();
+            ShaderManager::SpriteShader->setMat4("view", view);
+            ShaderManager::SpriteShader->setMat4("projection", projection);
+            ShaderManager::SpriteShader->setInt("spriteTexture", 0);       
+           
+            map->DrawMap(*ShaderManager::SpriteShader);
+                        
+        }
+    }
+
 }
 
 

@@ -11,6 +11,8 @@
 #include <stb\stb_image.h>
 
 #include "ObjectManager.h"
+#include "TileMap.h"
+
 #include "SelectedDataManager.h"
 
 
@@ -46,7 +48,9 @@ public:
 	//// Plane
 	void RenderSprite(const glm::mat4& view, const glm::mat4& projection,
 		 std::vector<std::unique_ptr<BaseModel>>& ObjectVector, int& currentIndex, int& SpriteIdx);
-	
+
+	void RenderTileMap(const glm::mat4& view, const glm::mat4& projection,
+		std::vector<std::unique_ptr<BaseModel>>& ObjectVector, int& currentIndex, int& MapIdx);
 	
 
 

@@ -158,6 +158,9 @@
     <ClInclude Include="src\Camera\Camera2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Ecs\TileMap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Textures\Icon.png">

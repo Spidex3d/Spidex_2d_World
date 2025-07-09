@@ -11,6 +11,8 @@ extern const int TILE_GRASS;
 extern const int MAP_IDX;
 extern const int PLAYER_SPRITE;
 
+extern char nameBuffer[128];
+
 extern bool ShouldAddPlayerSprite;		// add a player
 extern bool ShouldUpdatePlayerSprite;		// update player
 extern bool ShouldAddTileMap;		// add a map
@@ -22,6 +24,7 @@ extern int TileMapNo;
 
 extern int SpriteIdx;
 extern int MapIdx;
+extern bool IsMap;
 
 // #### Map Editor ######
 extern bool showGrid; // show grid and enabel editing

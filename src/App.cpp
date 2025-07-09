@@ -78,8 +78,8 @@ void App::RunApp()
 
 			settings.SettingsWindow(window);  // Initialize the Settings Window
 
-			//EntityNodes::Instance()->EntityManagmentSystem(entityComponents.GetModels(), currentIndex,
-			//	index, objectIndex, indexTypeID); // Entity Management System Scene list
+			EntityNodes::Instance()->EntityManagmentSystem(entityComponents.GetModels(), currentIndex,
+				index, objectIndex, indexTypeID); // Entity Management System Scene list
 
 			
 			

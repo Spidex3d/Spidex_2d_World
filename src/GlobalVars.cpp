@@ -6,6 +6,9 @@ const int TILE_GRASS = 1;
 
 const int MAP_IDX = 1;
 const int PLAYER_SPRITE = 2;
+
+char nameBuffer[128] = "";
+
 bool ShouldAddPlayerSprite = false;
 bool ShouldUpdatePlayerSprite = false;
 bool ShouldAddTileMap = false;
@@ -18,6 +21,7 @@ int TileMapNo = 0;
 
 int SpriteIdx = 0;
 int MapIdx = 0;
+bool IsMap = false;
 
 // #### Map Editor ######
 bool showGrid = false;

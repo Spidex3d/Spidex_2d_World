@@ -6,6 +6,10 @@
 #include "../Headers/config.h"
 #include "../Headers/GlobalVars.h"
 #include "../Shader/Shader.h"
+#include "../Windows/spx_FileDialog.h"
+
+#include <fstream>
+#include <sstream>
 
 #include <filesystem>
 namespace fs = std::filesystem;
@@ -177,55 +181,184 @@ public:
 
         if (ShowTileEditor) { // if this is true open the editor window
             ImGui::GetStyle().WindowRounding = 12.0f;
-            ImGui::Begin("Game Editor", &ShowTileEditor);
-            //ImGui::InputText("sky Name", nameBuffer, IM_ARRAYSIZE(nameBuffer));
-            ImGui::TextColored(COLOR_LIGHTBLUE, ICON_FA_EDIT " Tile Editor");
-            ImGui::SeparatorText("Game Editor");
+            ImGui::Begin("Map Editor", &ShowTileEditor);
+            ImGui::InputText("Map Name", nameBuffer, IM_ARRAYSIZE(nameBuffer));
+            ImGui::TextColored(COLOR_LIGHTBLUE, ICON_FA_EDIT " Map Editor");
+            
+            if (ImGui::CollapsingHeader(ICON_FA_MALE " Player ", ImGuiTreeNodeFlags_DefaultOpen)) {
 
-            // put an if in here
-            if (dialogType) {
-                ImGui::SeparatorText(" Tile Picker");
-                ImGui::TextColored(COLOR_LIGHTBLUE, ICON_FA_IMAGE " Available Tile Textures");
+            }
+                if (ImGui::CollapsingHeader(ICON_FA_MAP " Level Map", ImGuiTreeNodeFlags_DefaultOpen)) {
+                    if (ImGui::CollapsingHeader(ICON_FA_MAP " Level Map", ImGuiTreeNodeFlags_DefaultOpen)) {
+                        ImGui::SliderInt("Grid Width", &gridWidth, 1, 100);
+                        ImGui::SliderInt("Grid Height", &gridHeight, 1, 100);
+                        ImGui::SliderFloat("Tile Size", &tileSize, 16.0f, 64.0f);
 
-                if (!TileLoaded) {                            // this is the folder
-                    tileTexture = loadTileTextureFromFolder("Textures/");
-                    TileLoaded = true;
+                        if (placedTiles.size() != gridWidth || placedTiles[0].size() != gridHeight) {
+                            placedTiles = std::vector<std::vector<int>>(gridWidth, std::vector<int>(gridHeight, -1));
+                        }
+
+                        ImVec2 canvasPos = ImGui::GetCursorScreenPos();
+                        ImVec2 canvasSize(gridWidth * tileSize, gridHeight * tileSize);
+                        ImDrawList* drawList = ImGui::GetWindowDrawList();
+                        ImVec2 mousePos = ImGui::GetIO().MousePos;
+
+                        // Draw each cell
+                        for (int y = 0; y < gridHeight; ++y) {
+                            for (int x = 0; x < gridWidth; ++x) {
+                                ImVec2 tileMin = ImVec2(canvasPos.x + x * tileSize, canvasPos.y + y * tileSize);
+                                ImVec2 tileMax = ImVec2(tileMin.x + tileSize, tileMin.y + tileSize);
+
+                                // Handle click
+                                bool hovered = ImGui::IsMouseHoveringRect(tileMin, tileMax);
+                                if (hovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
+                                    placedTiles[x][y] = selectedTileID;
+                                }
+
+                                // Draw tile texture if assigned
+                                GLuint texID = 0;
+                                for (const auto& t : tileTexture) {
+                                    if (t.id == placedTiles[x][y]) {
+                                        texID = t.tileTexID;
+                                        break;
+                                    }
+                                }
+
+                                if (texID != 0) {
+                                    drawList->AddImage((ImTextureID)(intptr_t)texID, tileMin, tileMax);
+                                }
+                                else {
+                                    drawList->AddRectFilled(tileMin, tileMax, IM_COL32(40, 40, 40, 255)); // empty tile
+                                }
+
+                                drawList->AddRect(tileMin, tileMax, IM_COL32(100, 100, 100, 255)); // grid border
+                            }
+                        }
+
+                        ImGui::Dummy(canvasSize); // reserve space
+                    }
+
+                    
                 }
 
-                int columns = 6;
-                int count = 0;
-                ImGui::BeginChild("TextureGrid", ImVec2(0, 300), true); // scrollable
+            
 
-                for (const auto& tile : tileTexture) {
-                    ImGui::PushID(tile.id);
-                    if (ImGui::ImageButton((void*)(intptr_t)tile.tileTexID, ImVec2(64, 64))) {
-                     
-                        if (objectUpdateIndex != -1) {
+            ImGui::SeparatorText("Map Level Tiles");
+            if (ImGui::CollapsingHeader(ICON_FA_VIDEO" Tile Textures", ImGuiTreeNodeFlags_DefaultOpen)) {
 
-                            ObjectVector[objectUpdateIndex]->textureID = tile.id;
-                            creatTileTex = tile.id;
-                            ShouldUpdateTile = true;
+                
+                if (dialogType) {
+                    ImGui::SeparatorText(" Tile Picker");
+                    ImGui::TextColored(COLOR_LIGHTBLUE, ICON_FA_IMAGE " Available Tile Textures");
 
-                           
+                    if (!TileLoaded) {                            // this is the folder
+                        tileTexture = loadTileTextureFromFolder("Textures/");
+                        TileLoaded = true;
+                    }
+
+                    int columns = 6;
+                    int count = 0;
+                    ImGui::BeginChild("TextureGrid", ImVec2(0, 300), true); // scrollable
+
+                    for (const auto& tile : tileTexture) {
+                        ImGui::PushID(tile.id);
+                        if (ImGui::ImageButton((void*)(intptr_t)tile.tileTexID, ImVec2(64, 64))) {
+
+                            selectedTileID = tile.id; // New bit                           
+
+                           /* if (objectUpdateIndex != -1) {
+
+                                ObjectVector[objectUpdateIndex]->textureID = tile.id;
+                                creatTileTex = tile.id;
+                                ShouldUpdateTile = true;
+
+
+                            }*/
+                        }
+                        ImGui::PopID();
+
+                        if (++count % columns != 0) ImGui::SameLine();
+                    }
+
+                    ImGui::EndChild();
+                }
+            }
+
+            // Save button 
+            spx_FileDialog saveFileDialog;
+            IsMap = true;
+            if (ImGui::Button("Save Map")) { 
+                std::string mapPath = saveFileDialog.saveFileDialog();
+
+                if (!mapPath.empty()) {
+                    // Add .spm if missing
+                    if (mapPath.find(".spm") == std::string::npos) {
+                        mapPath += ".spm";
+                    }
+
+                    std::ofstream outFile(mapPath); // Use the selected file path
+                    if (outFile.is_open()) {
+                        for (int y = 0; y < gridHeight; ++y) {
+                            for (int x = 0; x < gridWidth; ++x) {
+                                outFile << placedTiles[x][y];
+                                if (x < gridWidth - 1)
+                                    outFile << " ";
+                            }
+                            outFile << "\n";
+                        }
+                        outFile.close();
+                        std::cout << "Map saved: " << mapPath << std::endl;
+                    }
+                    else {
+                        std::cerr << "Failed to open file for saving: " << mapPath << std::endl;
+                    }
+                }
+                else {
+                    std::cout << "Save canceled.\n";
+                }
+
+                IsMap = false;
+            }
+
+            ImGui::SameLine();
+
+            // Load Map 
+            spx_FileDialog openFileDialog;
+            IsMap = true; // Set this before calling the dialog
+            if (ImGui::Button("Load Map")) {
+                    std::string mapPath = openFileDialog.openFileDialog();  //  Get selected path from dialog
+
+                    if (!mapPath.empty()) {
+                        std::ifstream inFile(mapPath); //  Use returned path
+                        if (inFile.is_open()) {
+                            std::string line;
+                            int y = 0;
+                            while (std::getline(inFile, line) && y < gridHeight) {
+                                std::istringstream ss(line);
+                                int value;
+                                int x = 0;
+                                while (ss >> value && x < gridWidth) {
+                                    placedTiles[x][y] = value;
+                                    ++x;
+                                }
+                                ++y;
+                            }
+                            inFile.close();
+                            std::cout << "Map loaded: " << mapPath << "\n";
+                        }
+                        else {
+                            std::cerr << "Failed to open map file: " << mapPath << "\n";
                         }
                     }
-                    ImGui::PopID();
-
-                    if (++count % columns != 0) ImGui::SameLine();
-                }
-
-                ImGui::EndChild();
+                        else {
+                        std::cout << "Load canceled.\n";
+                        }
+                    IsMap = false;
             }
 
-            // Update button                           
-            if (ImGui::Button("Update")) { 
-                
-                ShowTileEditor = false;
+            
 
-                creatMap = 0;
 
-            }
-            ImGui::SameLine();
             if (ImGui::Button("Close Editor")) {
                 ShowTileEditor = false;
             }
@@ -234,5 +367,12 @@ public:
         }
 
     }
+private:
+
+    int selectedTileID = -1; // stores ID of the selected tile
+    int gridWidth = 16;
+    int gridHeight = 16;
+    float tileSize = 32.0f;
+    std::vector<std::vector<int>> placedTiles;
 
 };

@@ -33,8 +33,8 @@ public:
 
 	std::vector<std::unique_ptr<BaseModel>>& GetModels();
 
-	/*void EntityManagmentSystem(std::vector<std::unique_ptr<BaseModel>>& ObjectVector, int& currentIndex,
-		int& index, int& objectIndex, int& indexTypeID);*/
+	void EntityManagmentSystem(std::vector<std::unique_ptr<BaseModel>>& ObjectVector, int& currentIndex,
+		int& index, int& objectIndex, int& indexTypeID);
 
 	
 	
@@ -59,7 +59,7 @@ private:
 	// Object Mesh Editor
 	
 	bool showObjectEditor = false;
-	char nameBuffer[128] = "";
+	//char nameBuffer[128] = "";
 	
 	glm::mat4 modelMatrix;
 

@@ -7,6 +7,7 @@ class spx_FileDialog
 {
 public:
 	std::string openFileDialog();
+	std::string saveFileDialog();
 
 };
 
